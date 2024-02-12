@@ -1,0 +1,13 @@
+haveged
+mpv
+yt-dlp
+filezilla
+firefox
+flatpak
+libreoffice-fresh
+neofetch
+qbittorrent
+upower
+bitwarden
+duf
+htop
