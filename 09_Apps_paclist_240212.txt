@@ -1,4 +1,13 @@
+bitwarden
+blender
+chromium
+dolphin-plugins
+duf
+elisa
+gimp
+gparted
 haveged
+htop
 mpv
 yt-dlp
 filezilla
@@ -6,8 +15,10 @@ firefox
 flatpak
 libreoffice-fresh
 neofetch
+nextcloud-client
+partitionmanager
 qbittorrent
+telegram-desktop
+thunderbird
 upower
-bitwarden
-duf
-htop
+vivaldi
