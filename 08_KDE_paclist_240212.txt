@@ -3,7 +3,7 @@ dolphin
 egl-wayland
 konsole
 kwrite
-networkmanager
+networkmanager-qt
 plasma-meta
 print-manager
 sddm
