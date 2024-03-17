@@ -1,4 +1,5 @@
 avahi
+cifs-utils
 curl
 dnsutils
 iptables-nft
@@ -9,6 +10,7 @@ networkmanager-openvpn
 network-manager-applet
 nm-connection-editor
 nss-mdns
+smbclient
 ufw
 wget
 whois
