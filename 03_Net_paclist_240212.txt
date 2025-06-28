@@ -1,4 +1,5 @@
 avahi
+bluez
 cifs-utils
 curl
 dnsutils
