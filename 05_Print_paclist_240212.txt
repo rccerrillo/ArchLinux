@@ -1,4 +1,6 @@
+bluez-cups
 cups
+cups-browsed
 cups-pdf
 cups-filters
 cups-pk-helper
@@ -11,6 +13,8 @@ foomatic-db-nonfree-ppds
 ghostscript
 gsfonts
 gutenprint
+libcups
+libcupsfilters
 python-pillow
 python-pip
 python-pyqt5
