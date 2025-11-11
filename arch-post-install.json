@@ -1,0 +1,115 @@
+{
+  "base_system": {
+    "description": "Core utilities for base Arch installation",
+    "packages": [
+      "base-devel", "linux-headers", "man-db", "man-pages", "sudo",
+      "dhclient", "iw", "wpa_supplicant", "networkmanager",
+      "bash-completion", "zsh", "fish",
+      "grub", "os-prober", "efibootmgr",
+      "ntp", "chrony"
+    ]
+  },
+
+  "system_admin": {
+    "description": "Essential system administration and productivity tools",
+    "packages": [
+      "htop", "glances", "btop",
+      "ncdu", "ranger", "mc",
+      "rsync", "borgbackup", "rclone",
+      "tmux", "screen",
+      "vim", "neovim", "nano",
+      "lshw", "inxi", "neofetch",
+      "zip", "unzip", "p7zip", "tar"
+    ]
+  },
+
+  "networking": {
+    "description": "Networking and remote access tools",
+    "packages": [
+      "openssh", "mosh",
+      "openvpn", "wireguard-tools",
+      "nmap", "traceroute", "mtr", "tcpdump", "wireshark-cli",
+      "curl", "wget", "scp", "sftp",
+      "ufw", "nftables", "fail2ban",
+      "bind", "dnsutils", "whois"
+    ]
+  },
+
+  "cybersecurity": {
+    "description": "Pen-testing and security auditing tools",
+    "packages": [
+      "lynis", "clamav",
+      "masscan", "arp-scan",
+      "tshark", "tcpdump",
+      "hashcat", "john",
+      "metasploit", "exploitdb",
+      "binwalk", "foremost", "sleuthkit"
+    ]
+  },
+
+  "development": {
+    "description": "Programming, scripting, and AUR management",
+    "packages": [
+      "git", "git-lfs",
+      "python", "python-pip", "go", "rust", "perl",
+      "cmake", "make", "gcc",
+      "yay", "paru"
+    ]
+  },
+
+  "monitoring": {
+    "description": "System and network monitoring tools",
+    "packages": [
+      "netdata", "prometheus", "grafana",
+      "logrotate", "journalctl", "rsyslog",
+      "gotify-server", "ntfy",
+      "sysstat"
+    ]
+  },
+
+  "desktop_environment": {
+    "description": "Optional GUI and desktop packages",
+    "packages": [
+      "xorg", "xorg-xinit",
+      "plasma", "gnome", "xfce4", "lxqt",
+      "sddm", "gdm", "lightdm",
+      "nemo", "thunar",
+      "kitty", "alacritty",
+      "firefox", "chromium",
+      "libreoffice-fresh", "okular",
+      "vlc", "mpv",
+      "flameshot"
+    ]
+  },
+
+  "storage_virtualization": {
+    "description": "Storage, NAS, and virtualization tools",
+    "packages": [
+      "samba", "nfs-utils", "autofs",
+      "qemu", "virt-manager", "libvirt", "dnsmasq", "bridge-utils",
+      "docker", "podman", "buildah", "kubectl",
+      "btrfs-progs", "zfs-dkms"
+    ]
+  },
+
+  "cloud_msp": {
+    "description": "MSP and cloud integration utilities",
+    "packages": [
+      "syncthing", "rclone",
+      "pass", "bitwarden-cli",
+      "remmina", "rustdesk",
+      "ansible", "terraform",
+      "alpine", "mutt"
+    ]
+  },
+
+  "system_hardening": {
+    "description": "Post-install security and hardening tools",
+    "packages": [
+      "linux-hardened",
+      "auditd", "apparmor", "selinux",
+      "pacman-contrib", "reflector",
+      "gnupg", "cryptsetup", "openssl"
+    ]
+  }
+}
