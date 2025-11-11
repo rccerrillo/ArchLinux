@@ -108,7 +108,7 @@
     "description": "Post-install security and hardening tools",
     "packages": [
       "linux-hardened",
-      "auditd", "apparmor", "bluez,
+      "auditd", "apparmor",
       "pacman-contrib", "reflector",
       "gnupg", "cryptsetup", "openssl"
     ]
