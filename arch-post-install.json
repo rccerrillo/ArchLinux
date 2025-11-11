@@ -18,7 +18,7 @@
       "rsync", "borgbackup", "rclone",
       "tmux", "screen",
       "vim", "neovim", "nano",
-      "lshw", "inxi", "neofetch",
+      "lshw", "inxi", "fastfetch",
       "zip", "unzip", "p7zip", "tar"
     ]
   },
@@ -63,7 +63,8 @@
       "netdata", "prometheus", "grafana",
       "logrotate", "journalctl", "rsyslog",
       "gotify-server", "ntfy",
-      "sysstat"
+      "sysstat", "power-profiles-daemon",
+      "pipewire", "pipewire-alsa", "pipewire-pulse", "wireplumber"
     ]
   },
 
@@ -78,7 +79,7 @@
       "firefox", "chromium",
       "libreoffice-fresh", "okular",
       "vlc", "mpv",
-      "flameshot"
+      "flameshot", "bluez", "bluez-utils", "pipewire-bluetooth"
     ]
   },
 
@@ -107,7 +108,7 @@
     "description": "Post-install security and hardening tools",
     "packages": [
       "linux-hardened",
-      "auditd", "apparmor", "selinux",
+      "auditd", "apparmor", "bluez,
       "pacman-contrib", "reflector",
       "gnupg", "cryptsetup", "openssl"
     ]
