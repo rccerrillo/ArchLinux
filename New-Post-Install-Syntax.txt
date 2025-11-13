@@ -1,6 +1,6 @@
 ## Copy and Paste below to run...after downloading from git ##
 
 sudo ./install_arch_from_json.sh -f arch_post_install.json \
-  --categories "system_admin,networking,cybersecurity" \
+  --categories "robs_shizzle" \
   --aur \
   --no-confirm
