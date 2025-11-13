@@ -36,7 +36,7 @@ Optional:
 
 Examples:
   sudo $0 -f arch_post_install.json
-  sudo $0 -f arch_post_install.json --categories "system_admin,networking,cybersecurity" --aur
+  sudo $0 -f arch_post_install.json --categories "robs_shizzle" --aur
 EOF
 }
 
