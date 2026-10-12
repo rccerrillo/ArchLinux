@@ -58,13 +58,13 @@ PACKAGES=(
     man-db man-pages plocate
 
     # CLI tools
-    wget git rsync rclone unzip
+    wget git rsync rclone unzip fastfetch
 
     # Sync / networking
     syncthing tailscale mullvad-vpn
 
     # Desktop apps
-    firefox ark flatpak
+    firefox ark flatpak mission-center
 
     # Printing
     cups cups-filters cups-pdf ghostscript gsfonts
