@@ -1,9 +1,0 @@
-ark
-dolphin
-egl-wayland
-konsole
-kwrite
-networkmanager-qt
-plasma-meta
-print-manager
-sddm
