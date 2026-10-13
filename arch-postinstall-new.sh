@@ -37,8 +37,8 @@ sudo tee /etc/xdg/reflector/reflector.conf >/dev/null <<EOF
 # Managed by arch-postinstall.sh
 --country ${REFLECTOR_COUNTRY}
 --protocol https
---latest 10
---fastest 10
+--latest 5
+--fastest 5
 --age 8
 --sort rate
 --save /etc/pacman.d/mirrorlist

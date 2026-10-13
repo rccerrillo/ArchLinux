@@ -298,11 +298,12 @@ sudo pacman -S --needed \
   plasma-pa pipewire pipewire-pulse wireplumber \
   kscreen \
   xdg-desktop-portal-kde \
-  konsole dolphin dolphin-plugins \
+  konsole dolphin dolphin-plugins kate \
   breeze-gtk kde-gtk-config \
   noto-fonts \
   kwallet kwalletmanager kwallet-pam ksshaskpass \
-  kdeplasma-addons
+  kdeplasma-addons \
+  discover
 ```
 
 Enable the system services:
