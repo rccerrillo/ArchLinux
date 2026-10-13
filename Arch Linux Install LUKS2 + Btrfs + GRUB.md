@@ -229,6 +229,13 @@ Rebuild the images. Missing-firmware warnings are normal; ERROR lines are not.
 mkinitcpio -P
 ```
 
+**Verify before rebooting.** Confirm the keyfile was actually embedded. If this prints nothing, `FILES=` is still empty or `mkinitcpio -P` ran before the keyfile existed; fix `FILES=` and rebuild.
+
+```bash
+grep ^FILES /etc/mkinitcpio.conf                          # FILES=(/crypto_keyfile.bin)
+lsinitcpio /boot/initramfs-linux.img | grep crypto_keyfile # must print crypto_keyfile.bin
+```
+
 ## 11. Install and configure GRUB
 
 Get the UUID of the LUKS partition (not the mapper device):
@@ -293,7 +300,9 @@ sudo pacman -S --needed \
   xdg-desktop-portal-kde \
   konsole dolphin dolphin-plugins \
   breeze-gtk kde-gtk-config \
-  noto-fonts
+  noto-fonts \
+  kwallet kwalletmanager kwallet-pam ksshaskpass \
+  kdeplasma-addons
 ```
 
 Enable the system services:
@@ -308,7 +317,7 @@ sudo systemctl enable power-profiles-daemon.service # power profiles in powerdev
 - PipeWire, `pipewire-pulse` and WirePlumber are **user** services that start on login; don't enable them with `sudo`.
 - If another display manager is enabled (for example SDDM), use `sudo systemctl enable -f plasmalogin.service` to replace it.
 
-Reboot. Plasma Login Manager appears; log in to a Plasma (Wayland) session. Check audio with `wpctl status` and Bluetooth with `bluetoothctl show`.
+`kwallet-pam` unlocks KWallet automatically at login, as long as the wallet password matches your login password and the wallet uses Blowfish encryption, not GPG. Keep that in mind when KWallet first asks to create a wallet. Reboot. Plasma Login Manager appears; log in to a Plasma (Wayland) session. Check audio with `wpctl status` and Bluetooth with `bluetoothctl show`.
 
 ## 14. Set up Snapper and bootable snapshots
 
@@ -423,6 +432,7 @@ Problems hit during this install and their fixes.
 | pacman: `unknown trust` / corrupted package | Keyring empty or uninitialized | Rebuild keyring, step 8 |
 | `agent_genkey failed: No such file or directory` | Stale gpg-agent after deleting gnupg dir | `gpgconf --kill all`, `killall gpg-agent`, then `--init` again |
 | Two passphrase prompts at boot | No keyfile in initramfs, or `sd-encrypt` hook | Steps 9–11 |
+| Boot says keyfile could not be found, then asks for passphrase again | `FILES=()` left empty, so the keyfile isn't in the initramfs | Set `FILES=(/crypto_keyfile.bin)`, `mkinitcpio -P`, verify with `lsinitcpio` (step 10) |
 | GRUB rejects a correct passphrase | Keyslot uses Argon2id | Reformat or convert slot to PBKDF2 |
 | Plasma shows no sound cards | `sof-firmware` / `alsa-ucm-conf` not installed | Install them (step 6 list), reboot |
 | Only HDMI outputs in `aplay -l`; sink is Dummy Output | Legacy `snd_hda_intel` loaded instead of SOF | `dsp_driver=3` in `/etc/modprobe.d/sof.conf`, `mkinitcpio -P`, reboot (step 7) |
