@@ -201,7 +201,7 @@ info "Installing base system (pacstrap)"
 PACKAGES=(
   base base-devel linux linux-firmware btrfs-progs cryptsetup
   grub efibootmgr grub-btrfs inotify-tools "$UCODE"
-  networkmanager sudo vim nano terminus-font
+  networkmanager sudo vim nano terminus-font fwupd
   sof-firmware alsa-firmware alsa-ucm-conf alsa-utils
   pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber
 )

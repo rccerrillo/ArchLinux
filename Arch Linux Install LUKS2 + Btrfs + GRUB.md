@@ -129,7 +129,7 @@ Use `-K` so pacstrap initializes the new system's pacman keyring. Swap `intel-uc
 ```bash
 pacstrap -K /mnt base base-devel linux linux-firmware btrfs-progs cryptsetup \
   grub efibootmgr grub-btrfs inotify-tools intel-ucode \
-  networkmanager sudo vim nano terminus-font \
+  networkmanager sudo vim nano terminus-font fwupd \
   sof-firmware alsa-firmware alsa-ucm-conf alsa-utils \
   pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber
 
