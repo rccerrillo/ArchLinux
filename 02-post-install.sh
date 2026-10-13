@@ -50,6 +50,23 @@ ping -c 1 -W 3 archlinux.org >/dev/null 2>&1 \
   || die "No network. Connect first: nmcli device wifi connect \"SSID\" --ask"
 ok "Network up, sudo OK"
 
+# =============================================================================
+# pacman.conf: color output + 10 parallel downloads
+# =============================================================================
+info "Configuring pacman (Color, ParallelDownloads = 10)"
+PACCONF=/etc/pacman.conf
+sudo cp -n "$PACCONF" "$PACCONF.bak"
+sudo sed -i 's/^#\s*Color\s*$/Color/' "$PACCONF"
+if grep -Eq '^#?\s*ParallelDownloads' "$PACCONF"; then
+  sudo sed -i -E 's/^#?\s*ParallelDownloads\s*=.*/ParallelDownloads = 10/' "$PACCONF"
+else
+  sudo sed -i '/^\[options\]/a ParallelDownloads = 10' "$PACCONF"
+fi
+grep -q '^Color' "$PACCONF" || sudo sed -i '/^\[options\]/a Color' "$PACCONF"
+grep -q '^Color' "$PACCONF" || die "Failed to enable Color in $PACCONF."
+grep -q '^ParallelDownloads = 10' "$PACCONF" || die "Failed to set ParallelDownloads in $PACCONF."
+ok "pacman.conf updated (backup at $PACCONF.bak)"
+
 info "Updating system"
 sudo pacman -Syu --noconfirm
 
@@ -72,6 +89,7 @@ if yesno "Step 13: install KDE Plasma?" y; then
     noto-fonts
     kwallet kwalletmanager kwallet-pam ksshaskpass
     kdeplasma-addons
+    discover
   )
   sudo pacman -S --needed --noconfirm "${PLASMA_PKGS[@]}"
 
@@ -156,6 +174,21 @@ if yesno "Step 15: install paru (AUR helper)?" y; then
     command -v paru >/dev/null || die "paru did not install."
     ok "paru installed"
   fi
+fi
+
+# =============================================================================
+# Clone ArchLinux repo
+# =============================================================================
+REPO_URL="https://github.com/rccerrillo/ArchLinux.git"
+REPO_DIR="$HOME/ArchLinux"
+info "Cloning $REPO_URL"
+sudo pacman -S --needed --noconfirm git
+if [[ -d $REPO_DIR/.git ]]; then
+  git -C "$REPO_DIR" pull --ff-only
+  ok "Repo already present; updated $REPO_DIR"
+else
+  git clone "$REPO_URL" "$REPO_DIR"
+  ok "Cloned to $REPO_DIR"
 fi
 
 # =============================================================================
