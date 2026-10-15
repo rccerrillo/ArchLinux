@@ -11,6 +11,7 @@
 #   16. Apps, tools, printing, VPNs + their services
 #   17. Virtualization (QEMU/KVM/libvirt, TPM, SMB)
 #   18. Flatpak apps
+#   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer)
 # Mirrors are ranked with reflector before the first system update.
 # Each step can be skipped, and steps already done are detected and skipped.
 # =============================================================================
@@ -391,6 +392,46 @@ if yesno "Step 18: install Flatpak apps?" y; then
   info "Installing Flatpak apps"
   sudo flatpak install -y --noninteractive --system flathub "${FLATPAKS[@]}"
   ok "Flatpak apps installed"
+fi
+
+# =============================================================================
+# 19. Vendor / AUR apps (Brave Origin, RealVNC Viewer)
+# =============================================================================
+if yesno "Step 19: install Brave Origin and RealVNC Viewer?" y; then
+  HAVE_PARU=false
+  command -v paru >/dev/null && HAVE_PARU=true
+
+  # Brave Origin via Brave's official installer. It installs from the Arch
+  # repos when available, otherwise from the AUR via paru.
+  info "Installing Brave Origin (official Brave installer)"
+  if command -v brave-origin >/dev/null || pacman -Qq brave-origin brave-origin-bin &>/dev/null; then
+    ok "Brave Origin already installed"
+  elif curl -fsS https://dl.brave.com/install.sh | FLAVOR=origin sh; then
+    ok "Brave Origin installed"
+  else
+    warn "Brave Origin install failed. If it says no AUR helper was found, run step 15 (paru) and retry:"
+    warn "  curl -fsS https://dl.brave.com/install.sh | FLAVOR=origin sh"
+  fi
+
+  # RealVNC Viewer from the AUR. The AUR package often lags RealVNC's
+  # releases by a few weeks; it updates through paru once the maintainer
+  # bumps it.
+  info "Installing RealVNC Viewer (AUR: realvnc-vnc-viewer)"
+  if pacman -Qq realvnc-vnc-viewer &>/dev/null; then
+    ok "RealVNC Viewer already installed"
+  elif [[ $HAVE_PARU == true ]]; then
+    if paru -S --needed --noconfirm --skipreview realvnc-vnc-viewer; then
+      ok "RealVNC Viewer installed"
+    else
+      warn "RealVNC Viewer build failed (often because the AUR version's download"
+      warn "was pulled upstream). Check the AUR comments, or build it yourself:"
+      warn "  paru -G realvnc-vnc-viewer && cd realvnc-vnc-viewer"
+      warn "  # bump pkgver in PKGBUILD to the current release, then:"
+      warn "  updpkgsums && makepkg -si"
+    fi
+  else
+    warn "paru not installed (step 15 skipped); skipping RealVNC Viewer."
+  fi
 fi
 
 # =============================================================================
