@@ -139,7 +139,9 @@ fi
 # =============================================================================
 if yesno "Step 14: set up Snapper and bootable snapshots?" y; then
   info "Installing Snapper"
-  sudo pacman -S --needed --noconfirm snapper snap-pac btrfs-assistant
+  # grub-btrfs builds the "Arch Linux snapshots" GRUB submenu;
+  # inotify-tools lets grub-btrfsd watch /.snapshots for new snapshots.
+  sudo pacman -S --needed --noconfirm snapper snap-pac btrfs-assistant grub-btrfs inotify-tools
 
   if [[ -f /etc/snapper/configs/root ]]; then
     ok "Snapper root config already exists; skipping create-config"
@@ -188,7 +190,16 @@ if yesno "Step 14: set up Snapper and bootable snapshots?" y; then
   sudo snapper -c root create -d "baseline after post-install"
   sudo snapper -c root list
   sudo grub-mkconfig -o /boot/grub/grub.cfg
-  ok "Snapper configured; snapshots will appear in the GRUB menu"
+
+  # Confirm the snapshot submenu was generated and is wired into grub.cfg
+  if sudo test -s /boot/grub/grub-btrfs.cfg && sudo grep -q 'grub-btrfs.cfg' /boot/grub/grub.cfg; then
+    ok "Snapper configured; snapshot submenu is in the GRUB menu"
+  else
+    warn "GRUB snapshot submenu was NOT generated. Check the 'Detecting snapshots'"
+    warn "lines from: sudo grub-mkconfig -o /boot/grub/grub.cfg"
+  fi
+  systemctl is-active --quiet grub-btrfsd.service \
+    || warn "grub-btrfsd is not running; new snapshots won't be added to GRUB automatically."
 fi
 
 # =============================================================================
@@ -447,6 +458,19 @@ if [[ -d $REPO_DIR/.git ]]; then
 else
   git clone "$REPO_URL" "$REPO_DIR"
   ok "Cloned to $REPO_DIR"
+fi
+
+# =============================================================================
+# Final GRUB refresh so every snapshot taken during this run is listed
+# =============================================================================
+if [[ -f /etc/snapper/configs/root ]]; then
+  info "Regenerating GRUB menu with all snapshots"
+  sudo grub-mkconfig -o /boot/grub/grub.cfg
+  if sudo test -s /boot/grub/grub-btrfs.cfg && sudo grep -q 'grub-btrfs.cfg' /boot/grub/grub.cfg; then
+    ok "Snapshot submenu present in GRUB"
+  else
+    warn "Snapshot submenu still missing from GRUB; see the grub-mkconfig output above."
+  fi
 fi
 
 # =============================================================================
