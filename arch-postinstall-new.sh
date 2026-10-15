@@ -37,7 +37,7 @@ sudo tee /etc/xdg/reflector/reflector.conf >/dev/null <<EOF
 # Managed by arch-postinstall.sh
 --country ${REFLECTOR_COUNTRY}
 --protocol https
---latest 5
+--latest 20
 --fastest 5
 --age 8
 --sort rate
@@ -73,6 +73,38 @@ PACKAGES=(
 
     # Network printer discovery
     avahi nss-mdns
+
+    # Network tools
+    bind                # dig, nslookup, host
+    iputils             # ping, tracepath, arping
+    inetutils           # hostname, telnet, ftp
+    net-tools           # ifconfig, netstat, route (legacy)
+    traceroute mtr      # path tracing
+    nmap                # port scanning / host discovery
+    tcpdump             # packet capture
+    iperf3              # bandwidth testing
+    ethtool             # NIC settings and stats
+    whois
+    openbsd-netcat      # nc (also used by virt-manager for remote hosts)
+
+    # Virtualization: QEMU / KVM / libvirt
+    qemu-full           # all QEMU system emulators and tools
+    libvirt             # virtualization daemon and API
+    virt-manager        # GUI for managing VMs
+    virt-viewer         # SPICE/VNC console viewer
+    virt-install        # create VMs from the CLI (virt-install)
+    edk2-ovmf           # UEFI firmware incl. Secure Boot (Windows 11)
+    swtpm               # software TPM 2.0 emulator (Windows 11)
+    dnsmasq             # DHCP/DNS for libvirt's default NAT network
+    nftables            # firewall backend libvirt uses for NAT
+    dmidecode           # host hardware info for libvirt
+    virtiofsd           # virtiofs shared folders between host and VM
+
+    # SMB / CIFS
+    samba               # SMB server; also enables QEMU's built-in SMB share
+    smbclient           # browse/test SMB shares from the CLI
+    cifs-utils          # mount SMB shares (mount -t cifs)
+    kio-extras          # smb:// browsing in Dolphin
 )
 
 info "Installing packages"
@@ -114,8 +146,39 @@ SYSTEM_UNITS=(
     avahi-daemon.service       # printer discovery
     tailscaled.service
     mullvad-daemon.service
+    libvirtd.service           # VM management daemon
 )
 sudo systemctl enable --now "${SYSTEM_UNITS[@]}"
+
+# ---------------------------------------------------------------------------
+# 5. Virtualization setup
+# ---------------------------------------------------------------------------
+info "Configuring virtualization"
+
+if [[ -e /dev/kvm ]]; then
+    echo "  KVM is available."
+else
+    warn "/dev/kvm not found. Enable Intel VT-x / AMD-V (SVM) in your BIOS/UEFI,"
+    warn "otherwise VMs will run in slow software emulation."
+fi
+
+# Let your user manage system VMs without a password prompt
+sudo usermod -aG libvirt "$USER"
+
+# Have virsh talk to the system instance (the same one virt-manager uses)
+mkdir -p "$HOME/.config/libvirt"
+if [[ ! -f "$HOME/.config/libvirt/libvirt.conf" ]] || \
+   ! grep -q '^uri_default' "$HOME/.config/libvirt/libvirt.conf"; then
+    echo 'uri_default = "qemu:///system"' >> "$HOME/.config/libvirt/libvirt.conf"
+fi
+
+# Start the default NAT network now and on every boot
+if sudo virsh net-info default &>/dev/null; then
+    sudo virsh net-autostart default >/dev/null
+    sudo virsh net-start default 2>/dev/null || true
+else
+    warn "libvirt 'default' network not found; create it in virt-manager"
+fi
 
 info "Enabling user services"
 systemctl --user enable --now syncthing.service
@@ -136,7 +199,13 @@ Next steps:
   * Mullvad:     mullvad account login <account-number>   (or use the GUI)
   * Syncthing:   http://127.0.0.1:8384
   * Printers:    System Settings -> Printers
-  * Log out and back in so Flatpak apps appear in the menu.
+  * Log out and back in (or reboot) so Flatpak apps appear in the menu
+    and your new 'libvirt' group membership takes effect.
+  * VMs:         open Virtual Machine Manager. For Windows 11, choose
+                 "Customize before install", set firmware to a *secboot*
+                 OVMF image, and add a TPM (emulated, CRB, v2.0).
+  * Samba:       no SMB server is configured. Create /etc/samba/smb.conf
+                 before enabling smb.service if you want to share folders.
 
 Note: Mullvad and Tailscale can conflict over routing/DNS when both are
 connected. Only run one at a time unless you've configured split routing.
