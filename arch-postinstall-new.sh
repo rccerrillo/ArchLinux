@@ -133,6 +133,26 @@ fi
 info "Ensuring Flathub remote exists"
 sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
+# Apps only. Runtimes (Freedesktop, GNOME, KDE platforms), Mesa, VAAPI and
+# codec extensions are pulled in automatically as dependencies.
+FLATPAKS=(
+    com.github.tchx84.Flatseal              # Flatpak permissions editor
+    io.github.flattool.Warehouse            # Flatpak manager
+    io.github.giantpinkrobots.flatsweep     # Flatpak leftover cleaner
+    com.microsoft.Edge
+    com.ticktick.TickTick
+    net.cozic.joplin_desktop
+    org.fkoehler.KTailctl                   # Tailscale GUI for KDE
+    org.gnome.Calculator
+    org.kde.kamoso                          # webcam app
+    org.libreoffice.LibreOffice
+    us.zoom.Zoom
+    org.gtk.Gtk3theme.Breeze                # Breeze theme for GTK Flatpaks
+)
+
+info "Installing Flatpak apps"
+sudo flatpak install -y --noninteractive --system flathub "${FLATPAKS[@]}"
+
 # ---------------------------------------------------------------------------
 # 4. Services
 # ---------------------------------------------------------------------------
