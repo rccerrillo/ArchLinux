@@ -12,6 +12,7 @@
 #   17. Virtualization (QEMU/KVM/libvirt, TPM, SMB)
 #   18. Flatpak apps
 #   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer)
+#   20. Firewall (UFW: deny incoming, allow outgoing)
 # Mirrors are ranked with reflector before the first system update.
 # Each step can be skipped, and steps already done are detected and skipped.
 # =============================================================================
@@ -124,6 +125,7 @@ if yesno "Step 13: install KDE Plasma?" y; then
     kwallet kwalletmanager kwallet-pam ksshaskpass
     kdeplasma-addons
     discover
+    spectacle
   )
   sudo pacman -S --needed --noconfirm "${PLASMA_PKGS[@]}"
 
@@ -398,6 +400,7 @@ if yesno "Step 18: install Flatpak apps?" y; then
     org.kde.kamoso                          # webcam app
     org.libreoffice.LibreOffice
     us.zoom.Zoom
+    org.mozilla.Thunderbird
     org.gtk.Gtk3theme.Breeze                # Breeze theme for GTK Flatpaks
   )
   info "Installing Flatpak apps"
@@ -458,6 +461,32 @@ if [[ -d $REPO_DIR/.git ]]; then
 else
   git clone "$REPO_URL" "$REPO_DIR"
   ok "Cloned to $REPO_DIR"
+fi
+
+# =============================================================================
+# 20. Firewall (UFW)
+# =============================================================================
+if yesno "Step 20: enable UFW firewall (deny incoming, allow outgoing)?" y; then
+  info "Installing and configuring UFW"
+  sudo pacman -S --needed --noconfirm ufw
+
+  sudo ufw default deny incoming
+  sudo ufw default allow outgoing
+
+  # libvirt VMs on the default NAT network get DHCP/DNS from the host over
+  # virbr0 and route out through it. Default-deny would block both, so
+  # VMs would get no IP address and no internet.
+  if pacman -Qq libvirt &>/dev/null; then
+    sudo ufw allow in on virbr0 comment 'libvirt VM DHCP/DNS'
+    sudo ufw route allow in on virbr0 comment 'libvirt VM NAT out'
+    sudo ufw route allow out on virbr0 comment 'libvirt VM NAT return'
+    ok "Allowed libvirt VM traffic on virbr0"
+  fi
+
+  sudo ufw --force enable
+  sudo systemctl enable --now ufw.service
+  sudo ufw status verbose
+  ok "UFW active: incoming denied, outgoing allowed"
 fi
 
 # =============================================================================
