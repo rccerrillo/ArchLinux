@@ -11,7 +11,7 @@
 #   16. Apps, tools, printing, VPNs + their services
 #   17. Virtualization (QEMU/KVM/libvirt, TPM, SMB)
 #   18. Flatpak apps
-#   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer)
+#   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine)
 #   20. Firewall (UFW: deny incoming, allow outgoing)
 # Mirrors are ranked with reflector before the first system update.
 # Each step can be skipped, and steps already done are detected and skipped.
@@ -126,6 +126,9 @@ if yesno "Step 13: install KDE Plasma?" y; then
     kdeplasma-addons
     discover
     spectacle
+    kdeconnect          # phone integration (UFW ports opened in step 20)
+    gwenview            # image viewer
+    nextcloud-client    # Nextcloud desktop sync client
   )
   sudo pacman -S --needed --noconfirm "${PLASMA_PKGS[@]}"
 
@@ -233,7 +236,7 @@ if yesno "Step 16: install apps, network tools, printing and VPNs?" y; then
     man-db man-pages plocate
 
     # CLI tools
-    wget git rsync rclone unzip fastfetch
+    wget git rsync rclone unzip fastfetch btop htop
 
     # Sync / VPN
     syncthing tailscale mullvad-vpn
@@ -409,9 +412,9 @@ if yesno "Step 18: install Flatpak apps?" y; then
 fi
 
 # =============================================================================
-# 19. Vendor / AUR apps (Brave Origin, RealVNC Viewer)
+# 19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine)
 # =============================================================================
-if yesno "Step 19: install Brave Origin and RealVNC Viewer?" y; then
+if yesno "Step 19: install Brave Origin, RealVNC Viewer and Cine?" y; then
   HAVE_PARU=false
   command -v paru >/dev/null && HAVE_PARU=true
 
@@ -445,6 +448,21 @@ if yesno "Step 19: install Brave Origin and RealVNC Viewer?" y; then
     fi
   else
     warn "paru not installed (step 15 skipped); skipping RealVNC Viewer."
+  fi
+
+  # Cine video player from the AUR. Lives here rather than in step 13
+  # because paru doesn't exist until step 15.
+  info "Installing Cine (AUR: cine)"
+  if pacman -Qq cine &>/dev/null; then
+    ok "Cine already installed"
+  elif [[ $HAVE_PARU == true ]]; then
+    if paru -S --needed --noconfirm --skipreview cine; then
+      ok "Cine installed"
+    else
+      warn "Cine build failed; retry later with: paru -S cine"
+    fi
+  else
+    warn "paru not installed (step 15 skipped); skipping Cine."
   fi
 fi
 
@@ -481,6 +499,13 @@ if yesno "Step 20: enable UFW firewall (deny incoming, allow outgoing)?" y; then
     sudo ufw route allow in on virbr0 comment 'libvirt VM NAT out'
     sudo ufw route allow out on virbr0 comment 'libvirt VM NAT return'
     ok "Allowed libvirt VM traffic on virbr0"
+  fi
+
+  # KDE Connect discovers and talks to paired devices on 1714-1764 TCP+UDP
+  if pacman -Qq kdeconnect &>/dev/null; then
+    sudo ufw allow 1714:1764/udp comment 'KDE Connect'
+    sudo ufw allow 1714:1764/tcp comment 'KDE Connect'
+    ok "Allowed KDE Connect (1714-1764 TCP/UDP)"
   fi
 
   sudo ufw --force enable
