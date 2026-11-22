@@ -11,7 +11,7 @@
 #   16. Apps, tools, printing, VPNs + their services
 #   17. Virtualization (QEMU/KVM/libvirt, TPM, SMB)
 #   18. Flatpak apps
-#   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine)
+#   19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine, Betterbird)
 #   20. Firewall (UFW: deny incoming, allow outgoing)
 # Mirrors are ranked with reflector before the first system update.
 # Each step can be skipped, and steps already done are detected and skipped.
@@ -403,7 +403,6 @@ if yesno "Step 18: install Flatpak apps?" y; then
     org.kde.kamoso                          # webcam app
     org.libreoffice.LibreOffice
     us.zoom.Zoom
-    org.mozilla.Thunderbird
     org.gtk.Gtk3theme.Breeze                # Breeze theme for GTK Flatpaks
   )
   info "Installing Flatpak apps"
@@ -412,9 +411,9 @@ if yesno "Step 18: install Flatpak apps?" y; then
 fi
 
 # =============================================================================
-# 19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine)
+# 19. Vendor / AUR apps (Brave Origin, RealVNC Viewer, Cine, Betterbird)
 # =============================================================================
-if yesno "Step 19: install Brave Origin, RealVNC Viewer and Cine?" y; then
+if yesno "Step 19: install Brave Origin, RealVNC Viewer, Cine and Betterbird?" y; then
   HAVE_PARU=false
   command -v paru >/dev/null && HAVE_PARU=true
 
@@ -463,6 +462,20 @@ if yesno "Step 19: install Brave Origin, RealVNC Viewer and Cine?" y; then
     fi
   else
     warn "paru not installed (step 15 skipped); skipping Cine."
+  fi
+
+  # Betterbird (enhanced Thunderbird build), prebuilt binary from the AUR
+  info "Installing Betterbird (AUR: betterbird-bin)"
+  if pacman -Qq betterbird-bin &>/dev/null; then
+    ok "Betterbird already installed"
+  elif [[ $HAVE_PARU == true ]]; then
+    if paru -S --needed --noconfirm --skipreview betterbird-bin; then
+      ok "Betterbird installed"
+    else
+      warn "Betterbird install failed; retry later with: paru -S betterbird-bin"
+    fi
+  else
+    warn "paru not installed (step 15 skipped); skipping Betterbird."
   fi
 fi
 
